@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Me Devolve - Controle de Empréstimos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+<div class="max-w-5xl mx-auto p-6">
+  <header class="flex justify-between items-center py-6">
+    <h1 class="text-2xl font-bold">Me Devolve</h1>
+    <a href="/admin.html" class="bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Admin</a>
+  </header>
+
+  <div class="grid md:grid-cols-2 gap-6 mt-8">
+    <div class="bg-zinc-900 rounded-3xl p-6 border border-zinc-800">
+      <h2 class="text-lg font-semibold mb-4">Registrar empréstimo</h2>
+      <form id="form" class="space-y-4">
+        <input id="item" required placeholder="O que emprestou? ex: Furadeira" class="w-full bg-zinc-800 rounded-xl px-4 py-3 outline-none">
+        <input id="pessoa" required placeholder="Para quem? ex: João" class="w-full bg-zinc-800 rounded-xl px-4 py-3 outline-none">
+        <input id="whats" placeholder="WhatsApp (opcional)" class="w-full bg-zinc-800 rounded-xl px-4 py-3 outline-none">
+        <input id="data" type="date" class="w-full bg-zinc-800 rounded-xl px-4 py-3 outline-none">
+        <button class="w-full bg-white text-black rounded-xl py-3 font-semibold">Salvar</button>
+      </form>
+      <p id="msg" class="text-sm text-zinc-400 mt-3"></p>
+    </div>
+
+    <div class="bg-zinc-900 rounded-3xl p-6 border border-zinc-800">
+      <h2 class="text-lg font-semibold mb-4">Seus empréstimos</h2>
+      <div id="lista" class="space-y-3 text-sm"></div>
+    </div>
+  </div>
+</div>
+<script>
+const API = ""; // vai preencher depois com https://me-devolve.jeanaguiar636.workers.dev
+const form = document.getElementById('form');
+const lista = document.getElementById('lista');
+const msg = document.getElementById('msg');
+
+function load(){
+  const dados = JSON.parse(localStorage.getItem('me-devolve')||'[]');
+  lista.innerHTML = dados.length ? dados.map((d,i)=>`
+    <div class="bg-zinc-800 p-3 rounded-xl flex justify-between">
+      <div><b>${d.item}</b><br><span class="text-zinc-400">${d.pessoa} - ${d.data||''}</span></div>
+      <button onclick="devolver(${i})" class="text-xs bg-zinc-700 px-3 py-1 rounded-full h-fit">Devolveu</button>
+    </div>`).join('') : '<p class="text-zinc-500">Nenhum empréstimo ainda.</p>';
+}
+function devolver(i){
+  const dados = JSON.parse(localStorage.getItem('me-devolve')||'[]');
+  dados.splice(i,1);
+  localStorage.setItem('me-devolve', JSON.stringify(dados));
+  load();
+}
+form.onsubmit = (e)=>{
+  e.preventDefault();
+  const dados = JSON.parse(localStorage.getItem('me-devolve')||'[]');
+  dados.push({item:item.value,pessoa:pessoa.value,whats:whats.value,data:data.value});
+  localStorage.setItem('me-devolve', JSON.stringify(dados));
+  msg.textContent = 'Salvo! (local por enquanto)';
+  form.reset();
+  load();
+}
+load();
+</script>
+</body>
+</html>
